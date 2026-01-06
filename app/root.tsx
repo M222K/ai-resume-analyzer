@@ -9,6 +9,8 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { usePuterStore } from "./lib/puter";
+import { useEffect } from "react";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,6 +26,15 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+
+  //we will use the puter.ts function init which check puter is ready and chec if we are signed in to puter.com as soon as the page mounts
+  const {init}=usePuterStore();
+
+  useEffect(()=>{
+    init();
+  },[init]);
+
+
   return (
     <html lang="en">
       <head>
@@ -33,6 +44,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <script src="https://js.puter.com/v2/"></script>
+        {/* //by loading the puter.js as cdn script we can access all functionalities */}
         {children}
         <ScrollRestoration />
         <Scripts />
