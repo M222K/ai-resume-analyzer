@@ -21,7 +21,7 @@ export default function Home() {
   const navigate = useNavigate();
   //getting all resumes in form of array to map
   const [resumes,setResumes]=useState<Resume[]>([]);
-  const [loadingResumes,setLoadingResumes]=useState(false);
+  const [loadingResumes,setLoadingResumes]=useState(true);
 
   //to route to the user if logged in use hook useeffect whenever isauthenticated state changes
   //id user tries to access the route they are not logged in they will be blocked right here at the auth
@@ -32,23 +32,26 @@ export default function Home() {
 
   useEffect(()=>{
     const loadResumes=async()=>{
-      setLoadingResumes(true);
+      try {
+        const resumes=(await kv.list('resume:*',true))as KVItem[];
+        //map and parse all data
 
-      const resumes=(await kv.list('resume:*',true))as KVItem[];
-      //map and parse all data
+        const parsedResumes=resumes?.map((resume)=>{
+          return JSON.parse(resume.value)as Resume;
+        })
 
-      const parsedResumes=resumes?.map((resume)=>{
-        return JSON.parse(resume.value)as Resume;
-      })
+        console.log(parsedResumes);
 
-
-      console.log(parsedResumes);
-
-      setResumes(parsedResumes || []);
-      setLoadingResumes(false);
+        setResumes(parsedResumes || []);
+      } catch (error) {
+        console.error('Error loading resumes:', error);
+        setResumes([]);
+      } finally {
+        setLoadingResumes(false);
+      }
     }
     loadResumes();
-  })
+  }, [kv])
 
   return <main className="bg-[url('/images/bg-main.svg')] bg-cover">
     <Navbar/>
@@ -59,47 +62,36 @@ export default function Home() {
 
         <h1>Beat the ATS, Align your resume with AI accuracy</h1>
 
-        {!loadingResumes && resumes.length===0 ?(
-          <>
-          <h2>Smart Alignment for the Modern Job Hunter</h2>
-          <h3>No resumes found,Upload your first resume to get feedback</h3>
-          </>
-        ):(
+        {loadingResumes ? (
+          <h2>Loading your resumes...</h2>
+        ) : resumes.length === 0 ? (
+          <h2>No resumes found, Upload your first resume to get feedback</h2>
+        ) : (
           <h2>Smart Alignment for the Modern Job Hunter</h2>
         )}
       </div>
 
-      {loadingResumes &&(
+      {loadingResumes ? (
         <div className="flex flex-col items-center justify-center">
           <img src="/images/resume-scan-2.gif"
           className="w-50" alt="" />
         </div>
+      ) : resumes.length > 0 ? (
+        <div className="resumes-section">
+          {resumes.map((resume)=>{
+            return(
+              <ResumeCard key={resume.id} resume={resume}/>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center mt-10 gap-4">
+          <Link to="/upload"
+          className="primary-button w-fit text-xl font-semibold">
+          Upload Resume
+          </Link>
+        </div>
       )}
-
-    {/* //the resumes generated will be appear here by display of resume in array */}
-    {/* each resume will be object with properties */}
-    {/* render the resume if resumes length>0*/}
-
-    {!loadingResumes && resumes.length>0 && (
-      <div className="resumes-section">
-        
-        {resumes.map((resume)=>{
-          return(
-            <ResumeCard key={resume.id} resume={resume}/>
-          );
-        })}
-
-      </div>
-    )}
-
-    {!loadingResumes && resumes?.length===0 && (
-      <div className="flex flex-col items-center justify-center mt-10 gap-4">
-        <Link to="/upload"
-        className="primary-button w-fit text-xl font-semibold">
-        Upload Resume
-        </Link>
-      </div>
-    )}
     
   </section>
     
