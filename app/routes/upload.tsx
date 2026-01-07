@@ -19,8 +19,8 @@ const Upload = () => {
   }
 
 
-  // ...existing code...
   const handleAnalyze = async ({ companyName, jobTitle, jobDescription, file }: { companyName: string, jobTitle: string, jobDescription: string, file: File }) => {
+
     setIsProcessing(true);
 
     const uploadWithTimeout = async (files: File[], ms = 120000) => {
@@ -65,6 +65,7 @@ const Upload = () => {
       await kv.set(`resume:${uuid}`, JSON.stringify(data));
 
       setStatusText('Analyzing...');
+
       const feedback: any = await ai.feedback(
         uploadedfile.path,
         prepareInstructions({ jobTitle, jobDescription })
@@ -76,18 +77,20 @@ const Upload = () => {
         : feedback.message.content[0]?.text;
 
       data.feedback = JSON.parse(feedbackText);
+
       await kv.set(`resume:${uuid}`, JSON.stringify(data));
 
       setStatusText('Analysis complete, redirecting...');
+      console.log(data);
       navigate(`/resume/${uuid}`);
-      // Note: intentionally not setting isProcessing to false here; navigation will unmount this component.
+      
     } catch (err: any) {
       console.error(err);
       setStatusText(`Error: ${err?.message ?? 'Unknown error'}`);
-      // Intentionally do NOT call setIsProcessing(false) so the processing UI and form remain visible on error.
+      
     }
   }
-  // ...existing code...
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget.closest('form');
