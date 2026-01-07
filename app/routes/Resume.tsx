@@ -81,7 +81,7 @@ const Resume = () => {
             </nav>
 
             <div className='flex flex-row w-full max-lg:flex-col-reverse'>
-                <section className="feedback-section bg-[url('images/bg-small.svg')] bg-cover h-screen sticky top-0 items-center justify-center"
+                <section className="feedback-section bg-[url('/images/bg-small.svg')] bg-cover h-screen sticky top-0 items-center justify-center"
                 >
                     {imageUrl && resumeUrl && (
                         <div
@@ -118,7 +118,7 @@ const Resume = () => {
 
                         </div>
                     ):(
-                        <img src="images/resume-scan-2.gif" alt=""
+                        <img src="/images/resume-scan-2.gif" alt=""
                         className='w-full' />
                     )
                 }

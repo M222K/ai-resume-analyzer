@@ -69,7 +69,7 @@ const FileUploader = ({ onFileSelect }: FileUploaderProps) => {
                 </div>
             ) : (
                 <div {...getRootProps()}>
-                    <input {...getInputProps()} />
+                    <input {...getInputProps()} id="uploader" />
                     <div className='space-y-4 cursor-pointer'>
                         <div className='mx-auto w-16 h-16 flex items-center justify-center mb-2'>
                             <img src="icons/info.svg" alt="upload" className='size-20' />

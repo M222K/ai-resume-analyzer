@@ -76,6 +76,10 @@ interface PuterStore {
             path: string,
             message: string
         ) => Promise<AIResponse | undefined>;
+        analyzeText: (
+            text: string,
+            message: string
+        ) => Promise<AIResponse | undefined>;
         img2txt: (
             image: string | File | Blob,
             testMode?: boolean
@@ -354,6 +358,33 @@ export const usePuterStore = create<PuterStore>((set, get) => {
         ) as Promise<AIResponse | undefined>;
     };
 
+    const analyzeText = async (text: string, message: string) => {
+        const puter = getPuter();
+        if (!puter) {
+            setError("Puter.js not available");
+            return;
+        }
+
+        return puter.ai.chat(
+            [
+                {
+                    role: "user",
+                    content: [
+                        {
+                            type: "text",
+                            text: text,
+                        },
+                        {
+                            type: "text",
+                            text: message,
+                        },
+                    ],
+                },
+            ],
+            { model: "gpt-5-nano" }
+        ) as Promise<AIResponse | undefined>;
+    };
+
     const img2txt = async (image: string | File | Blob, testMode?: boolean) => {
         const puter = getPuter();
         if (!puter) {
@@ -439,6 +470,7 @@ export const usePuterStore = create<PuterStore>((set, get) => {
                 options?: PuterChatOptions
             ) => chat(prompt, imageURL, testMode, options),
             feedback: (path: string, message: string) => feedback(path, message),
+            analyzeText: (text: string, message: string) => analyzeText(text, message),
             img2txt: (image: string | File | Blob, testMode?: boolean) =>
                 img2txt(image, testMode),
         },

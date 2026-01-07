@@ -4,6 +4,7 @@ import FileUploader from "~/components/FileUploader";
 import { usePuterStore } from "~/lib/puter";
 import { useNavigate } from "react-router";
 import { convertPdfToImage } from "~/lib/Pdf2image";
+import { extractTextFromPdf } from "~/lib/pdfTextExtractor";
 import { generateUUID } from "~/lib/utils";
 import { prepareInstructions } from "../../constants";
 
@@ -45,6 +46,10 @@ const Upload = () => {
       const uploadedfile: any = await uploadWithTimeout([file]);
       if (!uploadedfile || !uploadedfile.path) throw new Error('Failed to upload file');
 
+      setStatusText('Extracting text from PDF...');
+      const resumeText = await extractTextFromPdf(file);
+      if (!resumeText) throw new Error('Failed to extract text from PDF');
+
       setStatusText('Converting to image...');
       const imageFile = await convertPdfToImage(file);
       if (!imageFile?.file) throw new Error('Failed to convert PDF to image');
@@ -59,6 +64,7 @@ const Upload = () => {
         id: uuid,
         resumePath: uploadedfile.path,
         imagePath: uploadedImage.path,
+        resumeText,
         companyName, jobTitle, jobDescription,
         feedback: '',
       }
@@ -66,8 +72,8 @@ const Upload = () => {
 
       setStatusText('Analyzing...');
 
-      const feedback: any = await ai.feedback(
-        uploadedfile.path,
+      const feedback: any = await ai.analyzeText(
+        resumeText,
         prepareInstructions({ jobTitle, jobDescription })
       );
       if (!feedback) throw new Error('Failed to analyze resume');
@@ -107,7 +113,7 @@ const Upload = () => {
   }
 
   return (
-    <main className="bg-[url('images/bg-main.svg')] bg-cover">
+    <main className="bg-[url('/images/bg-main.svg')] bg-cover">
       <Navbar />
 
       <section className="main-section">
@@ -123,6 +129,7 @@ const Upload = () => {
           )}
           {!isProcessing && (
             <form id="upload-form" onSubmit={handleSubmit} className="flex flex-col gap-4 mt-8">
+
               <div className="form-div">
                 <label htmlFor="company-name">Company Name</label>
                 <input type="text" name="company-name" placeholder="Company Name" id="company-name" />
@@ -133,7 +140,7 @@ const Upload = () => {
               </div>
               <div className="form-div">
                 <label htmlFor="job-description">Job Description</label>
-                <textarea rows={5} name="job-description" placeholder="Job Description" id="job-description" />
+                <textarea rows={5} name="job-description" placeholder="Job Description" id="job-description"></textarea>
               </div>
 
               <div className="form-div">
@@ -151,4 +158,4 @@ const Upload = () => {
     </main>
   )
 }
-export default Upload
+export default Upload;

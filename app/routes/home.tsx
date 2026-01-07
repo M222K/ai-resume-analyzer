@@ -28,7 +28,7 @@ export default function Home() {
 
 
 
-  return <main className="bg-[url('images/bg-main.svg')] bg-cover">
+  return <main className="bg-[url('/images/bg-main.svg')] bg-cover">
     <Navbar/>
 
     {/* //navbar component */}

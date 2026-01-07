@@ -28,7 +28,7 @@ const auth = () => {
 
     return (
         <main
-            className='bg-[url("images/bg-auth.svg")] bg-cover min-h-screen felx items-center justify-center'>
+            className='bg-[url("/images/bg-auth.svg")] bg-cover min-h-screen felx items-center justify-center'>
         <div className='flex flex-col gap-8 bg-white rounded-2xl p-10'>
             <section>
 
