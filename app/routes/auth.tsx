@@ -35,11 +35,10 @@ const auth = () => {
             <div className='flex flex-col items-center gap-2 text-center'>
                 <h1>Welcome</h1>
                 <h2>Log In to continue Your Job Journey</h2>
-            </div>
 
             <div>
                 {isLoading ?(
-                        <button className='auth-button animate-pulse'>
+                    <button className='auth-button animate-pulse'>
                             <p>Signing you in...</p>
                         </button>
                     ):( //or else we are already authenticated
@@ -60,6 +59,7 @@ const auth = () => {
                     )}
             </div>
 
+            </div>
 
             </section>
         </div>
